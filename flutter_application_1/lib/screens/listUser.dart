@@ -202,7 +202,7 @@ class _listUserState extends State<listUser> {
 
             return AlertDialog(
               title: Text(
-                'Edit Anggota',
+                'Edit Users',
                 style: headerOne,
               ),
               content: SingleChildScrollView(
@@ -224,7 +224,7 @@ class _listUserState extends State<listUser> {
                         nama = value;
                       },
                       decoration: InputDecoration(
-                          labelText: 'Nama', hintStyle: penjelasanSearch),
+                          labelText: 'Name', hintStyle: penjelasanSearch),
                     ),
                     TextFormField(
                       initialValue: alamat,
@@ -232,7 +232,7 @@ class _listUserState extends State<listUser> {
                         alamat = value;
                       },
                       decoration: InputDecoration(
-                          labelText: 'Alamat', hintStyle: penjelasanSearch),
+                          labelText: 'Address', hintStyle: penjelasanSearch),
                     ),
                     TextFormField(
                       initialValue: tanggalLahir,
@@ -240,7 +240,7 @@ class _listUserState extends State<listUser> {
                         tanggalLahir = value;
                       },
                       decoration: InputDecoration(
-                          labelText: 'Tanggal Lahir',
+                          labelText: 'Date Birth',
                           hintStyle: penjelasanSearch),
                     ),
                     TextFormField(
@@ -259,7 +259,7 @@ class _listUserState extends State<listUser> {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text('Batal', style: batal),
+                  child: Text('Cancel', style: batal),
                 ),
                 TextButton(
                   onPressed: () async {
@@ -293,7 +293,7 @@ class _listUserState extends State<listUser> {
                     Navigator.of(context).pop();
                   },
                   child: Text(
-                    'Simpan',
+                    'Save Change',
                     style: simpan,
                   ),
                 ),

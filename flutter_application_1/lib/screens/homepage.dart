@@ -141,13 +141,21 @@ class _homepageState extends State<homepage> {
             _selectedIndex = index;
             if (index == 0) {
               Navigator.pushReplacementNamed(context, '/home');
-            } 
+            } else if (index == 1) {
+              Navigator.pushReplacementNamed(context, '/addtabungan');
+            } else if (index == 2) {
+              Navigator.pushReplacementNamed(context, '/transaksi');
+            }
           });
         },
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.savings),
+            label: 'Tabungan',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.money),

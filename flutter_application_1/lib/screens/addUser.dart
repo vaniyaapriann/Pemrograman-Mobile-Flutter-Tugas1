@@ -212,58 +212,38 @@ void goAddUser(BuildContext context) async {
       }
     );      
     _storage.write('data', _response.data['data']);
-     if (_response.statusCode == 200) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Success"),
-              content: Text("User has been successfully added."),
-              actions: <Widget>[
-                MaterialButton(
-                  child: Text("OK"),
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Tutup dialog
-                    Navigator.pushNamed(context, '/home'); // Navigasi ke halaman beranda
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Error"),
-              content: Text("Failed to add. Please try again later."),
-              actions: <Widget>[
-                MaterialButton(
-                  child: Text("OK"),
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Tutup dialog
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      }
-    } on DioError catch (e) {
-      // Handle jika terjadi kesalahan
-      print('${e.response} - ${e.response?.statusCode}');
+    if (_response.statusCode == 200) {
+      print('Success: User has been successfully added.'); // Pesan di debug console
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Success"),
+            content: Text("User has been successfully added."),
+            actions: <Widget>[
+              MaterialButton(
+                child: Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Tutup dialog
+                  Navigator.pushNamed(context, '/home'); // Navigasi ke halaman beranda
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } else {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text("Error"),
-            content: Text("Failed to add member. Please try again later."),
+            content: Text("Failed to add. Please try again later."),
             actions: <Widget>[
               MaterialButton(
                 child: Text("OK"),
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  Navigator.of(context).pop(); // Tutup dialog
                 },
               ),
             ],
@@ -271,5 +251,26 @@ void goAddUser(BuildContext context) async {
         },
       );
     }
+  } on DioError catch (e) {
+    // Handle jika terjadi kesalahan
+    print('${e.response} - ${e.response?.statusCode}');
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Error"),
+          content: Text("Failed to add member. Please try again later."),
+          actions: <Widget>[
+            MaterialButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
+}
 }
