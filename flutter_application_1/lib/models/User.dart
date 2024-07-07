@@ -1,27 +1,43 @@
 class User {
-  int? id;
-  String? name;
-  String? email;
+  final int id;
+  final String nomorInduk;
+  final String nama;
+  final String alamat;
+  final String tanggalLahir;
+  final String telepon;
+  final int status;
 
   User({
-    this.id,
-    this.name,
-    this.email,
+    required this.id,
+    required this.nomorInduk,
+    required this.nama,
+    required this.alamat,
+    required this.tanggalLahir,
+    required this.telepon,
+    required this.status,
   });
 
-  //mengkonversi json to object user
-  User.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-    email = json['email'];
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['id'],
+      nomorInduk: json['nomor_induk'],
+      nama: json['nama'],
+      alamat: json['alamat'],
+      tanggalLahir: json['tanggal_lahir'],
+      telepon: json['telepon'],
+      status: json['status'],
+    );
   }
 
-//mengkonversi data object user to json
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['name'] = name;
-    data['email'] = email;
-    return data;
+    return {
+      'id': id,
+      'nomor_induk': nomorInduk,
+      'nama': nama,
+      'alamat': alamat,
+      'tanggal_lahir': tanggalLahir,
+      'telepon': telepon,
+      'status': status,
+    };
   }
 }

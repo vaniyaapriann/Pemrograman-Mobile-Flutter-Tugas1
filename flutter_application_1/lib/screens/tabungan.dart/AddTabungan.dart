@@ -1,192 +1,53 @@
-import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_application_1/components/myTextFields.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 class AddTabunganPage extends StatefulWidget {
+  const AddTabunganPage({Key? key}) : super(key: key);
+
   @override
-  _AddTabunganPage createState() => _AddTabunganPage();
+  _AddTabunganPageState createState() => _AddTabunganPageState();
 }
 
-class _AddTabunganPage extends State<AddTabunganPage> {
+class _AddTabunganPageState extends State<AddTabunganPage> {
   final Dio _dio = Dio();
   final GetStorage _storage = GetStorage();
   final String _apiUrl = 'https://mobileapis.manpits.xyz/api';
 
-  String? selectedAnggotaId; // Selected anggota ID
+  late int anggotaId;
+  late User user;
+  late String nama;
 
-  // Text editing controllers
-  final TextEditingController anggotaIdController = TextEditingController();
-  final TextEditingController trxIdController = TextEditingController();
-  final TextEditingController trxNominalController = TextEditingController();
+  TextEditingController nominalController = TextEditingController();
+  TextEditingController idTransaksiController = TextEditingController();
+  TextEditingController dateTransaksiController = TextEditingController();
 
-  List<String> anggotaIdList = []; // List to store anggota IDs
-  bool isLoading = false; // Loading status
-
-  int _selectedIndex = 1; // Index of selected item in bottom navigation bar
+  List<Map<int, String>> _jenisTransaksi = [
+    {1: 'Saldo Awal'},
+    {2: 'Simpanan'},
+    {3: 'Penarikan'},
+    {4: 'Bunga Simpanan'},
+    {5: 'Koreksi Penambahan'},
+    {6: 'Koreksi Pengurangan'},
+  ];
 
   @override
-  void initState() {
-    super.initState();
-    getAnggotaList(); // Fetch anggota list when the widget initializes
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0, // Remove elevation
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context); // Navigate back when pressed
-          },
-        ),
-        title: Text('Insert Transaksi Tabungan', style: TextStyle(color: Colors.black)),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Anggota ID:',
-              style: GoogleFonts.lato(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            Text(
-              selectedAnggotaId ?? 'No ID selected',
-              style: TextStyle(fontSize: 16),
-            ),
-            SizedBox(height: 20),
-
-            Text(
-              'Transaksi ID',
-              style: GoogleFonts.lato(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            MyTextFields(
-              controller: trxIdController,
-              hintText: 'Enter Transaksi ID',
-              obscureText: false,
-            ),
-            SizedBox(height: 20),
-
-            Text(
-              'Transaksi Nominal',
-              style: GoogleFonts.lato(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            MyTextFields(
-              controller: trxNominalController,
-              hintText: 'Enter Transaksi Nominal',
-              obscureText: false,
-            ),
-            SizedBox(height: 30),
-
-            ElevatedButton(
-              onPressed: () => insertTransaksiTabungan(context),
-              child: Text('Submit'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green, // background color
-                foregroundColor: Colors.white, // foreground color
-              ),
-            ),
-
-            SizedBox(height: 20),
-            if (isLoading)
-              Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                      Colors.blue), // Change the color
-                  strokeWidth: 3, // Adjust the stroke width
-                ),
-              ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        selectedItemColor: Color.fromARGB(255, 28, 95, 30),
-        unselectedItemColor: Colors.grey,
-        currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-            if (index == 0) {
-              Navigator.pushReplacementNamed(context, '/home');
-            } else if (index == 1) {
-              Navigator.pushReplacementNamed(context, '/tabungan');
-            } else if (index == 2) {
-              Navigator.pushReplacementNamed(context, '/transaksi');
-            }
-          });
-        },
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.savings),
-            label: 'Tabungan',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.money),
-            label: 'Transaksi',
-          ),
-        ],
-      ),
-    );
-  }
-
-  void getAnggotaList() async {
-    try {
-      setState(() {
-        isLoading = true; // Set loading status to true
-      });
-
-      final response = await _dio.get(
-        '$_apiUrl/anggota',
-        options: Options(
-          headers: {'Authorization': 'Bearer ${_storage.read('token')}'},
-        ),
-      );
-
-      if (response.statusCode == 200) {
-        final responseData = response.data;
-        final anggotaData = responseData['data']['anggotas'];
-        if (anggotaData is List) {
-          setState(() {
-            anggotaIdList =
-                anggotaData.map((anggota) => anggota['id'].toString()).toList();
-            if (anggotaIdList.isNotEmpty) {
-              selectedAnggotaId = anggotaIdList
-                  .first; // Set the first anggota ID as selected by default
-            }
-          });
-        }
-      } else {
-        print('Error: API request failed: ${response.statusCode}');
-      }
-    } on DioError catch (e) {
-      print('Terjadi kesalahan: ${e.message}');
-    } finally {
-      setState(() {
-        isLoading =
-            false; // Set loading status to false after API call is finished
-      });
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+    if (args != null) {
+      anggotaId = args['id'] as int;
+      nama = args['nama'] as String;
     }
   }
 
-  void insertTransaksiTabungan(BuildContext context) async {
-    final String anggotaId = selectedAnggotaId ?? '';
-    final int trxId = int.tryParse(trxIdController.text.trim()) ?? 0;
-    final double trxNominal =
-        double.tryParse(trxNominalController.text.trim()) ?? 0.0;
+  Future<void> insertTransaksiTabungan() async {
+    final trxNominal = nominalController.text.replaceAll('.', '');
+    final trxId = idTransaksiController.text;
+    final int trxIdInt = int.parse(trxId);
+    final String sign = [1, 2, 5].contains(trxIdInt) ? '+' : '-';
 
     try {
       final response = await _dio.post(
@@ -197,74 +58,259 @@ class _AddTabunganPage extends State<AddTabunganPage> {
         data: {
           'anggota_id': anggotaId,
           'trx_id': trxId,
-          'trx_nominal': trxNominal,
+          'trx_nominal': '$sign$trxNominal',
         },
       );
 
       if (response.statusCode == 200) {
-        print('Success: Transaction added successfully'); // Pesan di debug console
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text("Success", style: TextStyle(color: Colors.green)),
+              title: Text("Success"),
               content: Text("Transaksi has been successfully added."),
               actions: <Widget>[
-                TextButton(
+                MaterialButton(
+                  child: Text("OK"),
                   onPressed: () {
                     Navigator.of(context).pop(); // Close dialog
-                    Navigator.pushReplacementNamed(context, '/transaksi'); // Navigate to /transaksi
+                    Navigator.popUntil(context, ModalRoute.withName('/userDetail')); // Navigate back to previous page
                   },
-                  child: Text("OK"),
                 ),
               ],
             );
           },
         );
       } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Error", style: TextStyle(color: Colors.red)),
-              content: Text("Failed to add transaction. Please try again."),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Close dialog
-                  },
-                  child: Text("OK"),
-                ),
-              ],
-            );
-          },
-        );
+        showErrorDialog("Failed to add transaction. Please try again.");
       }
     } on DioError catch (e) {
-      print('${e.response} - ${e.response?.statusCode}');
-      String errorMessage =
-          'Failed to add transaction. Please try again later.';
+      String errorMessage = 'Failed to add transaction. Please try again later.';
       if (e.response?.statusCode == 409) {
         errorMessage = 'Transaction already exists.';
       }
-
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text("Error", style: TextStyle(color: Colors.red)),
-            content: Text(errorMessage),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close dialog
-                },
-                child: Text("OK"),
-              ),
-            ],
-          );
-        },
-      );
+      showErrorDialog(errorMessage);
     }
+  }
+
+  void showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  String formatNominal(int nominal) {
+    final formatter = NumberFormat('#,###', 'id_ID');
+    return formatter.format(nominal);
+  }
+
+  void showConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Confirmation'),
+          content: Text('Are you sure you want to perform this transaction?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                insertTransaksiTabungan();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        title: Text(
+          'Add Transaction',
+          style: GoogleFonts.urbanist(
+            fontSize: 24,
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Nama',
+              style: GoogleFonts.urbanist(
+                fontSize: 16,
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 4),
+            Container(
+              width: double.infinity,
+              height: 40,
+              padding: EdgeInsets.all(8),
+              margin: EdgeInsets.only(bottom: 8),
+              decoration: BoxDecoration(
+                border: Border.all(color: Color.fromARGB(255, 28, 95, 30)),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                '$nama',
+                style: GoogleFonts.urbanist(fontSize: 16),
+              ),
+            ),
+            Text(
+              'Transaksi',
+              style: GoogleFonts.urbanist(
+                fontSize: 16,
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 4),
+            Container(
+              width: double.infinity,
+              height: 50,
+              padding: EdgeInsets.all(8),
+              margin: EdgeInsets.only(bottom: 8),
+              decoration: BoxDecoration(
+                border: Border.all(color: Color.fromARGB(255, 28, 95, 30)),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: DropdownButtonFormField<int>(
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                ),
+                items: _jenisTransaksi
+                    .map((map) => DropdownMenuItem<int>(
+                          value: map.keys.first,
+                          child: Text('${map.keys.first} - ${map.values.first}'),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  idTransaksiController.text = value.toString();
+                },
+              ),
+            ),
+            SizedBox(height: 20),
+            Text(
+              'Nominal',
+              style: GoogleFonts.urbanist(
+                fontSize: 16,
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 4),
+            Container(
+              width: double.infinity,
+              height: 40,
+              padding: EdgeInsets.all(8),
+              margin: EdgeInsets.only(bottom: 8),
+              decoration: BoxDecoration(
+                border: Border.all(color: Color.fromARGB(255, 28, 95, 30)),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: TextField(
+                controller: nominalController,
+                decoration: InputDecoration(
+                  hintText: 'Nominal',
+                  border: InputBorder.none,
+                ),
+                keyboardType: TextInputType.number,
+                style: GoogleFonts.urbanist(fontSize: 16),
+                onChanged: (value) {
+                  String newValue = value.replaceAll('.', '');
+                  if (newValue.isNotEmpty) {
+                    int parsedValue = int.parse(newValue);
+                    nominalController.value = TextEditingValue(
+                      text: formatNominal(parsedValue),
+                      selection: TextSelection.collapsed(
+                        offset: formatNominal(parsedValue).length,
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: showConfirmationDialog,
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  side: const BorderSide(color: Color.fromARGB(255, 28, 95, 30)),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                backgroundColor: Color.fromARGB(255, 28, 95, 30),
+              ),
+              child: Text(
+                'Submit',
+                style: GoogleFonts.urbanist(fontSize: 15, color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class User {
+  final int id;
+  final String nomorInduk;
+  final String nama;
+  final String alamat;
+  final String tanggalLahir;
+  final String telepon;
+  final int statusAktif;
+
+  User({
+    required this.id,
+    required this.nomorInduk,
+    required this.nama,
+    required this.alamat,
+    required this.tanggalLahir,
+    required this.telepon,
+    required this.statusAktif,
+  });
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['id'],
+      nomorInduk: json['nomor_induk'].toString(),
+      nama: json['nama'],
+      alamat: json['alamat'],
+      tanggalLahir: json['tgl_lahir'],
+      telepon: json['telepon'],
+      statusAktif: json['status_aktif'],
+    );
   }
 }

@@ -1,8 +1,13 @@
+import 'dart:ui';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dio/dio.dart';
 import 'package:get_storage/get_storage.dart';
+
 
 class profile extends StatefulWidget {
   @override
@@ -10,8 +15,10 @@ class profile extends StatefulWidget {
 }
 
 class _profileState extends State<profile> {
-  String _name = '';
-  String _email = '';
+  int _selectedIndex = 3;
+
+  String _name= '';
+  String _email='';
 
   final _dio = Dio();
   final _storage = GetStorage();
@@ -23,106 +30,175 @@ class _profileState extends State<profile> {
     goDetail(context);
   }
 
-  @override
+  @override 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Profile',
-          style: GoogleFonts.urbanist(
-            fontSize: 20.0,
-            fontWeight: FontWeight.bold,
-            color: Colors.white, // Assuming a light app bar background
-          ),
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pushReplacementNamed(context, '/home'),
-        ),
-        backgroundColor: Colors.blueGrey[800], // Example color change
-      ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(20.0), // Adjust padding as needed
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // User profile section (highly customizable)
-              Row(
-                mainAxisAlignment: MainAxisAlignment
-                    .start, // Ubah menjadi MainAxisAlignment.start
-                children: [
-                  CircleAvatar(
-                    radius: 50.0, // Sesuaikan ukuran avatar
-                    backgroundColor: Colors.grey[200],
-                    backgroundImage: AssetImage(
-                      'assets/images/avatar.jpg',
-                    ),
-                  ),
+          padding: EdgeInsets.all(30.0),
+          child: Center(
+            child:
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
 
-                  SizedBox(
-                      width:
-                          20.0), // Tambahkan widget SizedBox untuk mengatur jarak antara gambar dan teks
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
+                //Bagian Profile
+                SizedBox(
+                  height: 100,
+                ),
+                Center(
+                  child: CircleAvatar(
+                    radius: 80,
+                    backgroundImage: AssetImage('assets/images/avatar.png'),
+                    backgroundColor: Colors.white,
+                  ) ,
+                ),
+                SizedBox(height: 40),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Name',
+                      style: GoogleFonts.lato(
+                        fontSize: 13,
+                        color: Colors.black,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: Colors.grey.shade100,
+                      ),
+                      child: Text(
                         _name,
                         style: GoogleFonts.urbanist(
-                          fontSize: 24.0,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
                           color: Colors.black,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text(
+                    ),
+                  ],
+                ),
+                SizedBox(height: 15),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Email',
+                      style: GoogleFonts.lato(
+                        fontSize: 13,
+                        color: Colors.black,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: Colors.grey.shade100,
+                      ),
+                      child: Text(
                         _email,
                         style: GoogleFonts.urbanist(
-                          fontSize: 18.0,
-                          color: Colors.black54,
+                          fontSize: 18,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
 
-              SizedBox(height: 20.0), // Adjust spacing
-            ],
+                //tombol logout
+                SizedBox(
+                  height: 100,
+                ),
+                Container(
+                  width: 350,
+                  height: 50,
+                  child: 
+                  ElevatedButton(
+                    onPressed: () {
+                      goLogout(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape:RoundedRectangleBorder(
+                        side: const BorderSide(
+                          color: Color.fromARGB(255, 28, 95, 30)),
+                        borderRadius: BorderRadius.circular(5)),
+                      backgroundColor: Color.fromARGB(255, 28, 95, 30),
+                    ), 
+                    child: 
+                    Text('Log Out',
+                      style: GoogleFonts.urbanist(
+                        fontSize: 15,
+                        color: Colors.white,
+                      ),
+                    )
+                  ),
+                ), 
+              ],
+            ),
           ),
         ),
       ),
+
+      //tombol Navbar
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1, // Indeks item yang terpilih secara default
-        onTap: (int index) {
-          // Aksi ketika item bottom navigation di-tap
-          if (index == 0) {
-            // Jika item dengan indeks 0 (home) di-tap
-            Navigator.pushReplacementNamed(context, '/home');
-          } else if (index == 1) {
-            // Jika item dengan indeks 1 (transaksi) di-tap
-            // Lakukan apa yang diperlukan untuk transaksi
-            print('Transaksi button tapped');
-          }
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
+        selectedItemColor: Color.fromARGB(255, 28, 95, 30),
+        unselectedItemColor: Colors.grey,
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+            switch (index) {
+              case 0:
+                Navigator.pushReplacementNamed(context, '/home');
+                break;
+              case 1:
+                Navigator.pushReplacementNamed(context, '/listuser');
+                break;
+              case 2:
+                Navigator.pushReplacementNamed(context, '/listbunga');
+                break;
+              case 3:
+                Navigator.pushReplacementNamed(context, '/profile');
+                break;
+            }
+          });
         },
         items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(Icons.home, color: _selectedIndex == 0 ? Color.fromARGB(255, 28, 95, 30) : Colors.grey),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.payment),
-            label: 'Transaksi',
+            icon: Icon(Icons.group, color: _selectedIndex == 1 ? Color.fromARGB(255, 28, 95, 30) : Colors.grey),
+            label: 'Member',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.local_florist, color: _selectedIndex == 2 ? Color.fromARGB(255, 28, 95, 30) : Colors.grey),
+            label: 'Bunga',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person, color: _selectedIndex == 3 ? Color.fromARGB(255, 28, 95, 30) : Colors.grey),
+            label: 'Profile',
           ),
         ],
       ),
     );
   }
-
   void goDetail(BuildContext context) async {
     try {
       final _response = await _dio.get(
-        '$_apiUrl/user',
+        '${_apiUrl}/user',
         options: Options(
           headers: {'Authorization': 'Bearer ${_storage.read('token')}'},
         ),
@@ -131,19 +207,35 @@ class _profileState extends State<profile> {
         Map<String, dynamic> responseData = _response.data;
         Map<String, dynamic> userData = responseData['data']['user'];
 
-        // Tanggapan berhasil, lanjutkan dengan pemrosesan data
+      // Tanggapan berhasil, lanjutkan dengan pemrosesan data
         String name = userData['name'];
         String email = userData['email'];
 
         setState(() {
           _name = name;
           _email = email;
-        });
+        }
+      );
       } else {
         // Tanggapan tidak berhasil, tampilkan pesan kesalahan atau tindakan yang sesuai
         print('Error: API request failed: ${_response.statusCode}');
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
+    print('${e.response} - ${e.response?.statusCode}');
+    }
+  }
+
+  void goLogout(BuildContext context) async {
+    try{
+      final _response = await _dio.get(
+        '${_apiUrl}/logout',
+        options: Options(
+          headers: {'Authorization': 'Bearer ${_storage.read('token')}'},
+        ),
+      );
+      print(_response.data);
+      Navigator.pushNamed(context, '/');
+    } on DioException catch (e) {
       print('${e.response} - ${e.response?.statusCode}');
     }
   }

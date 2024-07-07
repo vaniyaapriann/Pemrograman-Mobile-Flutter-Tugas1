@@ -1,12 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class SearchThing extends StatelessWidget {
-  const SearchThing({super.key});
+class SearchThing extends StatefulWidget {
+  final Function(String) onSearch;
 
+  const SearchThing({Key? key, required this.onSearch}) : super(key: key);
+
+  @override
+  _SearchThingState createState() => _SearchThingState();
+}
+
+class _SearchThingState extends State<SearchThing> {
+  final TextEditingController _controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: _controller,
+      onChanged: widget.onSearch,
       decoration: InputDecoration(
         hintText: 'Search Here',
         hintStyle: GoogleFonts.urbanist(
@@ -36,5 +46,10 @@ class SearchThing extends StatelessWidget {
         ),
       ),
     );
+  }
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }

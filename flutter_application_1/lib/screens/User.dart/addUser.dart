@@ -26,6 +26,23 @@ class _addUserState extends State<addUser> {
   final tanggalLahirController = TextEditingController();
   final alamatController = TextEditingController();
   final phoneController = TextEditingController();
+  final statusController = TextEditingController();
+
+  // Metode untuk memilih tanggal
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+
+    if (picked != null) {
+      setState(() {
+        tanggalLahirController.text = "${picked.toLocal()}".split(' ')[0];
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,8 +74,8 @@ class _addUserState extends State<addUser> {
                   Row(
                     children: [
                       Text('No Induk',
-                      style: GoogleFonts.lato(
-                        fontSize: 13,
+                      style: GoogleFonts.urbanist(
+                        fontSize: 16,
                         color: Colors.black,
                       ),),
                     ],
@@ -79,8 +96,8 @@ class _addUserState extends State<addUser> {
                   Row(
                     children: [
                       Text('Fullname',
-                      style: GoogleFonts.lato(
-                        fontSize: 13,
+                      style: GoogleFonts.urbanist(
+                        fontSize: 16,
                         color: Colors.black,
                       ),),
                     ],
@@ -101,8 +118,8 @@ class _addUserState extends State<addUser> {
                   Row(
                     children: [
                       Text('Address',
-                      style: GoogleFonts.lato(
-                        fontSize: 13,
+                      style: GoogleFonts.urbanist(
+                        fontSize: 16,
                         color: Colors.black,
                       ),),
                     ],
@@ -123,19 +140,24 @@ class _addUserState extends State<addUser> {
                 Row(
                   children: [
                     Text('Date of Birth',
-                    style: GoogleFonts.lato(
-                      fontSize: 13,
+                    style: GoogleFonts.urbanist(
+                      fontSize: 16,
                       color: Colors.black,
                     ),),
                   ],
                 ),
-                Container(
-                  width: 2000,
-                  height: 40,
-                  child: MyTextFields(
-                    controller: tanggalLahirController, 
-                    hintText: 'Date of Birth', 
-                    obscureText: false,
+                GestureDetector(
+                  onTap: () => _selectDate(context),
+                  child: AbsorbPointer(
+                    child: Container(
+                      width: 2000,
+                      height: 40,
+                      child: MyTextFields(
+                        controller: tanggalLahirController, 
+                        hintText: 'Date of Birth', 
+                        obscureText: false,
+                      ),
+                    ),
                   ),
                 ),
 
@@ -145,8 +167,8 @@ class _addUserState extends State<addUser> {
                 Row(
                   children: [
                     Text('Phone',
-                    style: GoogleFonts.lato(
-                    fontSize: 13,
+                    style: GoogleFonts.urbanist(
+                    fontSize: 16,
                     color: Colors.black,
                     ),),
                   ],
@@ -208,10 +230,12 @@ void goAddUser(BuildContext context) async {
         'alamat': alamatController.text,
         'tgl_lahir': tanggalLahirController.text,
         'telepon': phoneController.text,
-        'status_aktif': 1,
+        'status_aktif': 0,
       }
     );      
-    _storage.write('data', _response.data['data']);
+
+    print('Response data: ${_response.data}'); // Log response data
+
     if (_response.statusCode == 200) {
       print('Success: User has been successfully added.'); // Pesan di debug console
       showDialog(
@@ -233,12 +257,13 @@ void goAddUser(BuildContext context) async {
         },
       );
     } else {
+      print('Error: Failed to add user - Status Code: ${_response.statusCode}'); // Log error message
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text("Error"),
-            content: Text("Failed to add. Please try again later."),
+            content: Text("Failed to add user. Please try again later."),
             actions: <Widget>[
               MaterialButton(
                 child: Text("OK"),
@@ -252,14 +277,13 @@ void goAddUser(BuildContext context) async {
       );
     }
   } on DioError catch (e) {
-    // Handle jika terjadi kesalahan
-    print('${e.response} - ${e.response?.statusCode}');
+    print('DioError: ${e.response?.data} - Status Code: ${e.response?.statusCode}'); // Log error message
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("Error"),
-          content: Text("Failed to add member. Please try again later."),
+          content: Text("Failed to add user. Please try again later."),
           actions: <Widget>[
             MaterialButton(
               child: Text("OK"),
@@ -273,4 +297,5 @@ void goAddUser(BuildContext context) async {
     );
   }
 }
+
 }

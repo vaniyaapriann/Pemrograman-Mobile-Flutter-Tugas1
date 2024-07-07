@@ -13,90 +13,77 @@ class WelcomeScreen extends StatelessWidget {
           Container(
             height: double.infinity,
             width: double.infinity,
-            color: Colors.white,
+            color: Color.fromARGB(255, 210, 224, 201),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(top: 85.0),
+                  padding: const EdgeInsets.only(top: 80.0),
                   child: Image.asset(
-                    'assets/images/logo1.png',
-                    height: 280,
+                    'assets/images/logofix.png',
+                    height: 300,
                     width: 370,
                   ),
                 ),
-                SizedBox(height: 40),
+                SizedBox(height: 20),
                 Text(
-                  'Hello Welcome!',
+                  'Welcome to SaveSmart!',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Color.fromARGB(255, 55, 106, 56),
+                    fontSize: 24,
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Securely loans directly through the\nGet your easy, fast, and flexible business loans.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.black,
                   ),
                 ),
                 SizedBox(height: 30),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/login');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-                    backgroundColor: Color.fromARGB(255, 55, 106, 56), // Set the button's background color
-                  ),
-                  child: Text(
-                    'SIGN IN',
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/register');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-                    backgroundColor: Color.fromARGB(255, 55, 106, 56), // Set the button's background color
-                  ),
-                  child: Text(
-                    'REGISTER',
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 100),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Column(
-                    children: [
-                      Text(
-                        "Login with Social Media",
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/login');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 40),
+                        backgroundColor: Colors.white,
+                      ),
+                      child: Text(
+                        'Sign In',
                         style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white,
+                          color: Color.fromARGB(255, 55, 106, 56),
                         ),
                       ),
-                      SizedBox(height: 20),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 100),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Image.asset('assets/images/ig.png', height: 30, width: 30),
-                            Image.asset('assets/images/tw.png', height: 30, width: 30),
-                            Image.asset('assets/images/fc.png', height: 30, width: 30),
-                          ],
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/register');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 40),
+                        backgroundColor: Colors.white,
+                      ),
+                      child: Text(
+                        'Register',
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 55, 106, 56),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ],
             ),
