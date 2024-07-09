@@ -285,9 +285,10 @@ class _listUserState extends State<listUser> {
           setState(() {
             userList = userData
                 .map((userJson) => User.fromJson(userJson))
-                .where((user) => user.nama.toLowerCase().contains(searchQuery
-                    .toLowerCase())) // Filter berdasarkan query pencarian
-                .toList();
+                .where((user) => 
+                 user.nama.toLowerCase().contains(searchQuery.toLowerCase()))
+                .toList()
+                ..sort((a,b)=> a.nama.compareTo(b.nama));
             isUserNotFound = userList.isEmpty;
           });
         }

@@ -36,7 +36,8 @@ class _AddTabunganPageState extends State<AddTabunganPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     if (args != null) {
       anggotaId = args['id'] as int;
       nama = args['nama'] as String;
@@ -47,7 +48,7 @@ class _AddTabunganPageState extends State<AddTabunganPage> {
     final trxNominal = nominalController.text.replaceAll('.', '');
     final trxId = idTransaksiController.text;
     final int trxIdInt = int.parse(trxId);
-    final String sign = [1, 2, 5].contains(trxIdInt) ? '+' : '-';
+    final String sign = [1, 2, 5].contains(trxIdInt) ? '+' : '';
 
     try {
       final response = await _dio.post(
@@ -71,25 +72,33 @@ class _AddTabunganPageState extends State<AddTabunganPage> {
               content: Text("Transaksi has been successfully added."),
               actions: <Widget>[
                 MaterialButton(
-                  child: Text("OK"),
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Close dialog
-                    Navigator.popUntil(context, ModalRoute.withName('/userDetail')); // Navigate back to previous page
-                  },
-                ),
+                    child: Text("OK"),
+                    onPressed: () {
+                      //Navigator.of(context).pop(); // Close dialog
+                      Navigator.pushNamed(
+                        context,
+                        '/detailTabungan',
+                        arguments: {
+                          'id': user?.id,
+                          'nama': user?.nama,
+                        },
+                      );
+                    }),
               ],
             );
           },
         );
       } else {
-        showErrorDialog("Failed to add transaction. Please try again.");
+        showErrorDialog(
+            "Failed to add transaction. Status code: ${response.statusCode}. ${response.data}");
       }
     } on DioError catch (e) {
-      String errorMessage = 'Failed to add transaction. Please try again later.';
+      String errorMessage =
+          'Failed to add transaction. Please try again later.';
       if (e.response?.statusCode == 409) {
         errorMessage = 'Transaction already exists.';
       }
-      showErrorDialog(errorMessage);
+      showErrorDialog("$errorMessage\nError: ${e.response?.data}");
     }
   }
 
@@ -122,9 +131,14 @@ class _AddTabunganPageState extends State<AddTabunganPage> {
     showDialog(
       context: context,
       builder: (context) {
+        final trxNominal = nominalController.text.replaceAll('.', '');
+        final selectedTransactionType = _jenisTransaksi.firstWhere(
+            (map) => map.keys.first.toString() == idTransaksiController.text);
+        final transactionTypeName = selectedTransactionType.values.first;
         return AlertDialog(
           title: Text('Confirmation'),
-          content: Text('Are you sure you want to perform this transaction?'),
+          content: Text(
+              'Are you sure you want to perform this $transactionTypeName transaction of amount Rp $trxNominal?'),
           actions: [
             TextButton(
               onPressed: () {
@@ -212,7 +226,8 @@ class _AddTabunganPageState extends State<AddTabunganPage> {
                 items: _jenisTransaksi
                     .map((map) => DropdownMenuItem<int>(
                           value: map.keys.first,
-                          child: Text('${map.keys.first} - ${map.values.first}'),
+                          child:
+                              Text('${map.keys.first} - ${map.values.first}'),
                         ))
                     .toList(),
                 onChanged: (value) {
@@ -266,7 +281,8 @@ class _AddTabunganPageState extends State<AddTabunganPage> {
               onPressed: showConfirmationDialog,
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
-                  side: const BorderSide(color: Color.fromARGB(255, 28, 95, 30)),
+                  side:
+                      const BorderSide(color: Color.fromARGB(255, 28, 95, 30)),
                   borderRadius: BorderRadius.circular(5),
                 ),
                 backgroundColor: Color.fromARGB(255, 28, 95, 30),
@@ -314,3 +330,4 @@ class User {
     );
   }
 }
+

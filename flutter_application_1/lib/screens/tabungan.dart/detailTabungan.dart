@@ -16,6 +16,7 @@ class _ListDetailTabunganPageState extends State<ListDetailTabunganPage> {
   final _storage = GetStorage();
   final _apiUrl = 'https://mobileapis.manpits.xyz/api';
   late int anggotaId = 0;
+  late String nama = '';
 
   List<Tabungan> tabunganList = [];
   bool isLoading = false;
@@ -23,9 +24,11 @@ class _ListDetailTabunganPageState extends State<ListDetailTabunganPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = ModalRoute.of(context)?.settings.arguments;
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     if (args != null) {
-      anggotaId = args as int;
+      anggotaId = args['id'] as int;
+      nama = args['nama'] as String;
       getTabungan();
     }
   }
@@ -52,7 +55,7 @@ class _ListDetailTabunganPageState extends State<ListDetailTabunganPage> {
         }
 
         setState(() {
-          tabunganList = tempList.reversed.toList();
+        tabunganList = tempList.toList();
         });
       } else {
         print('Gagal memuat tabungan: ${response.statusCode}');
@@ -125,7 +128,7 @@ class _ListDetailTabunganPageState extends State<ListDetailTabunganPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Text(
-          'Detail Transaksi ',
+          'Detail Transaksi $nama',
           style: GoogleFonts.urbanist(
             fontSize: 24,
             color: Colors.black,
@@ -142,10 +145,12 @@ class _ListDetailTabunganPageState extends State<ListDetailTabunganPage> {
                   itemBuilder: (context, index) {
                     final tabungan = tabunganList[index];
                     final isNegative = (tabungan.trxNominal ?? 0) < 0;
-                    final transactionColor = isNegative ? Colors.red : Colors.green;
+                    final transactionColor =
+                        isNegative ? Colors.red : Colors.green;
 
                     return Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       child: Container(
                         padding: EdgeInsets.all(16),
                         decoration: BoxDecoration(
@@ -165,7 +170,7 @@ class _ListDetailTabunganPageState extends State<ListDetailTabunganPage> {
                               radius: 30,
                               backgroundColor: Colors.blue.shade100,
                               child: Icon(
-                                Icons.balance, 
+                                Icons.balance,
                                 color: Colors.blue,
                                 size: 30,
                               ),
@@ -196,7 +201,8 @@ class _ListDetailTabunganPageState extends State<ListDetailTabunganPage> {
                               ),
                             ),
                             Text(
-                              formatNominal(tabungan.trxNominal, tabungan.trxId),
+                              formatNominal(
+                                  tabungan.trxNominal, tabungan.trxId),
                               style: GoogleFonts.urbanist(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -227,14 +233,14 @@ class Tabungan {
   });
 
   Tabungan.fromJson(Map<String, dynamic> json)
-      : id = json['id'] ,
-      trxId = json['trx_id'],
+      : id = json['id'],
+        trxId = json['trx_id'],
         trxNominal = json['trx_nominal'],
         trxTanggal = DateTime.parse(json['trx_tanggal']);
 
   Map<String, dynamic> toJson() {
     return {
-      'id' : id,
+      'id': id,
       'trx_id': trxId,
       'trx_nominal': trxNominal,
       'trx_tanggal': trxTanggal?.toIso8601String(),

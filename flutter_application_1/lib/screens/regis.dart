@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_application_1/components/myTextFields.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -213,8 +212,59 @@ class _RegiscreenState extends State<Regiscreen> {
       );
       print(_response.data);
       _storage.write('token', _response.data['data']['token']);
+      showSuccessDialog(context);
     } on DioError catch (e) {
-      print('${e.response} - ${e.response?.statusCode}');
+    if (e.response != null) {
+      print('${e.response} - ${e.response!.statusCode}');
+      {
+        showErrorDialog(context, 'Invalid email or password. Please try again.');
+      };
+    } else {
+      print(e.message);
+      showErrorDialog(context, 'An error occurred. Please try again later.');
+      };
+    }
     }
   }
-}
+
+  void showSuccessDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Success"),
+          content: Text("Registration successful. Please login to continue."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                Navigator.pushNamed(context, '/login'); // Navigate to login page
+              },
+              child: Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Error"),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+

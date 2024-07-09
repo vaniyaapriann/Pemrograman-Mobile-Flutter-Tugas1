@@ -64,9 +64,8 @@ class _detailUserState extends State<detailUser> {
             alamatController.text = user!.alamat;
             teleponController.text = user!.telepon;
             tglLahirController.text = user!.tanggalLahir;
-            statusController.text = user!.statusAktif == 1
-                ? 'Aktif'
-                : 'Non Aktif';
+            statusController.text =
+                user!.statusAktif == 1 ? 'Aktif' : 'Non Aktif';
           }
         });
       } else {
@@ -169,7 +168,9 @@ class _detailUserState extends State<detailUser> {
           IconButton(
             icon: Icon(Icons.edit, color: Colors.black),
             onPressed: () async {
-              final updatedUser = await Navigator.pushNamed(context, '/editUser', arguments: user?.id);
+              final updatedUser = await Navigator.pushNamed(
+                  context, '/editUser',
+                  arguments: user?.id);
               if (updatedUser != null && updatedUser is User) {
                 setState(() {
                   user = updatedUser;
@@ -179,9 +180,8 @@ class _detailUserState extends State<detailUser> {
                   alamatController.text = user!.alamat;
                   teleponController.text = user!.telepon;
                   tglLahirController.text = user!.tanggalLahir;
-                  statusController.text = user!.statusAktif == 1
-                      ? 'Aktif'
-                      : 'Non Aktif';
+                  statusController.text =
+                      user!.statusAktif == 1 ? 'Aktif' : 'Non Aktif';
                 });
                 Navigator.pop(context, updatedUser);
               }
@@ -224,8 +224,7 @@ class _detailUserState extends State<detailUser> {
                             hintText: 'Telepon',
                             icon: Icons.phone),
                         SizedBox(height: 20),
-                        _buildStatusItem(
-                            user!.statusAktif),
+                        _buildStatusItem(user!.statusAktif),
                         SizedBox(height: 20),
                         _buildSaldoItem(saldo),
                         SizedBox(height: 30),
@@ -236,8 +235,14 @@ class _detailUserState extends State<detailUser> {
                               minWidth: 150,
                               height: 60,
                               onPressed: () {
-                                Navigator.pushNamed(context, '/detailTabungan',
-                                    arguments: user?.id);
+                                Navigator.pushNamed(
+                                  context,
+                                  '/detailTabungan',
+                                  arguments: {
+                                    'id': user?.id,
+                                    'nama': user?.nama,
+                                  },
+                                );
                               },
                               color: Color.fromARGB(255, 28, 95, 30),
                               elevation: 0,
@@ -276,8 +281,8 @@ class _detailUserState extends State<detailUser> {
                                     builder: (BuildContext context) {
                                       return AlertDialog(
                                         title: Text('User is inctive!'),
-                                        content: Text(
-                                            "Can't add any transaction."),
+                                        content:
+                                            Text("Can't add any transaction."),
                                         actions: <Widget>[
                                           TextButton(
                                             onPressed: () {
